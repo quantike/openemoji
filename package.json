@@ -1,0 +1,30 @@
+{
+  "name": "openemoji",
+  "version": "0.1.0",
+  "description": "OpenCode CLI plugin that expands emoji shortcodes in the prompt, the way Slack does.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quantike/openemoji.git"
+  },
+  "homepage": "https://github.com/quantike/openemoji#readme",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./index.ts",
+    "./tui": "./tui.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.22",
+    "gemoji": "^8.1.0"
+  },
+  "devDependencies": {
+    "@opentui/core": "^0.5.14",
+    "@types/bun": "^1.4.2",
+    "typescript": "^5"
+  }
+}
