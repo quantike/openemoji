@@ -24,24 +24,36 @@ export default Plugin.define({
       typeColon(editor)
     }
 
-    context.keymap.layer(() => ({
-      target: () => context.renderer.currentFocusedEditor,
-      commands: [
-        {
-          id: "emoji.shortcode.expand",
-          title: "Expand emoji shortcode",
-          bind: ":",
-          run: insertColon,
-        },
-        {
-          id: "emoji.shortcode.expand_shift",
-          title: "Expand emoji shortcode",
-          bind: "shift+:",
-          run: insertColon,
-        },
-      ],
-    }))
+    // The host resolves the keymap context at the call site, so the layer is
+    // created from a mounted slot render. The layer carries no target because a
+    // target is bound to the renderable focused at registration time and is
+    // never re-resolved; run() looks up the editor per keystroke instead.
+    const layer = context.ui.slot({
+      append: "app",
+      render: () => {
+        context.keymap.layer(() => ({
+          commands: [
+            {
+              id: "emoji.shortcode.expand",
+              title: "Expand emoji shortcode",
+              bind: ":",
+              run: insertColon,
+            },
+            {
+              id: "emoji.shortcode.expand_shift",
+              title: "Expand emoji shortcode",
+              bind: "shift+:",
+              run: insertColon,
+            },
+          ],
+        }))
+        return null
+      },
+    })
 
-    return footer
+    return () => {
+      footer()
+      layer()
+    }
   },
 })
