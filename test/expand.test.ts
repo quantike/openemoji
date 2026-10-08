@@ -1,75 +1,66 @@
 import { expect, test } from "bun:test"
 import { expansionAt } from "../src/expand"
 
-test("finds a shortcode typed at the end of the text", () => {
-  const text = "nice :thumbsup:"
-  expect(expansionAt(text, text.length)).toEqual({
-    start: 5,
+test("finds a shortcode closed at the end of the text", () => {
+  expect(expansionAt("nice :thumbsup:")).toEqual({
     shortcode: ":thumbsup:",
     emoji: "👍",
   })
 })
 
 test("resolves shortcode aliases", () => {
-  const text = "ship it :+1:"
-  expect(expansionAt(text, text.length)).toEqual({
-    start: 8,
+  expect(expansionAt("ship it :+1:")).toEqual({
     shortcode: ":+1:",
     emoji: "👍",
   })
 })
 
-test("finds a shortcode before the cursor with text after it", () => {
-  const text = ":tada: now"
-  expect(expansionAt(text, 6)).toEqual({
-    start: 0,
-    shortcode: ":tada:",
-    emoji: "🎉",
-  })
-})
-
 test("ignores unknown shortcodes", () => {
-  const text = ":not_an_emoji:"
-  expect(expansionAt(text, text.length)).toBeUndefined()
+  expect(expansionAt(":not_an_emoji:")).toBeUndefined()
 })
 
 test("ignores shortcodes with uppercase names", () => {
-  const text = ":Thumbsup:"
-  expect(expansionAt(text, text.length)).toBeUndefined()
+  expect(expansionAt(":Thumbsup:")).toBeUndefined()
 })
 
-test("ignores a shortcode that is not closed at the cursor", () => {
-  const text = ":thumbsup: extra"
-  expect(expansionAt(text, text.length)).toBeUndefined()
+test("ignores a shortcode that is not closed at the end", () => {
+  expect(expansionAt(":thumbsup: extra")).toBeUndefined()
 })
 
 test("ignores text that merely ends in colons", () => {
-  expect(expansionAt("http://host:8080:", 17)).toBeUndefined()
-  expect(expansionAt("12:30:", 6)).toBeUndefined()
-  expect(expansionAt("version:v1:", 11)).toBeUndefined()
+  expect(expansionAt("http://host:8080:")).toBeUndefined()
+  expect(expansionAt("12:30:")).toBeUndefined()
+  expect(expansionAt("version:v1:")).toBeUndefined()
 })
 
 test("ignores skin-tone style colon chains", () => {
-  const text = ":thumbsup::skin-tone-2:"
-  expect(expansionAt(text, text.length)).toBeUndefined()
+  expect(expansionAt(":thumbsup::skin-tone-2:")).toBeUndefined()
 })
 
 test("matches after whitespace and punctuation", () => {
-  expect(expansionAt("(:cat:", 6)).toEqual({
-    start: 1,
+  expect(expansionAt("(:cat:")).toEqual({
     shortcode: ":cat:",
     emoji: "🐱",
   })
-  expect(expansionAt("line one\n:cat:", 14)).toEqual({
-    start: 9,
+  expect(expansionAt("line one\n:cat:")).toEqual({
     shortcode: ":cat:",
     emoji: "🐱",
+  })
+})
+
+test("matches after an emoji", () => {
+  expect(expansionAt("👍:cat:")).toEqual({
+    shortcode: ":cat:",
+    emoji: "🐱",
+  })
+  expect(expansionAt("👁️ :heart:")).toEqual({
+    shortcode: ":heart:",
+    emoji: "❤️",
   })
 })
 
 test("matches at the start of the text", () => {
-  expect(expansionAt(":cat:", 5)).toEqual({
-    start: 0,
+  expect(expansionAt(":cat:")).toEqual({
     shortcode: ":cat:",
     emoji: "🐱",
   })
